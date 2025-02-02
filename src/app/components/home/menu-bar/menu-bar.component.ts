@@ -1,0 +1,18 @@
+import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+
+@Component({
+  selector: 'app-menu-bar',
+  imports: [RouterModule],
+  templateUrl: './menu-bar.component.html',
+  styleUrl: './menu-bar.component.css'
+})
+export class MenuBarComponent {
+  dropdowns: { [key: string]: boolean } = {
+    adminDropdown: false
+  };
+
+  toggleDropdown(dropdownName: string) {
+    this.dropdowns[dropdownName] = !this.dropdowns[dropdownName];
+  }
+}

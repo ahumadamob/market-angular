@@ -1,0 +1,79 @@
+<div class="container">
+  <h2 class="text-center mb-4">Formulario de Usuario</h2>
+
+  <form (ngSubmit)="onSubmit()" class="row g-3">
+    <div class="col-md-6">
+      <div class="mb-3">
+        <label for="username" class="form-label">Nombre de usuario</label>
+        <input type="text" id="username" class="form-control" required [(ngModel)]="user.username" name="username">
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <input type="password" id="password" class="form-control" required [(ngModel)]="user.password" name="password">
+      </div>
+
+      <div class="mb-3">
+        <label for="firstName" class="form-label">Nombre</label>
+        <input type="text" id="firstName" class="form-control" required [(ngModel)]="user.firstName" name="firstName">
+      </div>
+
+      <div class="mb-3">
+        <label for="role" class="form-label">Rol</label>
+        <select id="role" class="form-control" required [(ngModel)]="user.role" name="role">
+          <option value="USER">Usuario</option>
+          <option value="ADMIN">Administrador</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="mb-3">
+        <label for="email" class="form-label">Correo electrónico</label>
+        <input type="email" id="email" class="form-control" required [(ngModel)]="user.email" name="email">
+      </div>
+
+      <div class="mb-3">
+        <label for="lastName" class="form-label">Apellido</label>
+        <input type="text" id="lastName" class="form-control" required [(ngModel)]="user.lastName" name="lastName">
+      </div>
+
+      <div class="mb-3">
+        <label for="status" class="form-label">Estado</label>
+        <select id="status" class="form-control" required [(ngModel)]="user.status" name="status">
+          <option value="ACTIVE">Activo</option>
+          <option value="INACTIVE">Inactivo</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="createdAt" class="form-label">Fecha de Creación</label>
+        <input type="date" id="createdAt" class="form-control" required [(ngModel)]="user.createdAt" name="createdAt">
+      </div>
+    </div>
+
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Guardar</button>
+      <button type="button" class="btn btn-danger ms-2" (click)="openCancelModal()">Cancelar</button>
+    </div>
+  </form>
+</div>
+
+<!-- Modal para confirmar la cancelación -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancelModalLabel">Confirmar Cancelación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que deseas descartar los cambios?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn btn-danger" (click)="cancel()">Sí, descartar</button>
+      </div>
+    </div>
+  </div>
+</div>
