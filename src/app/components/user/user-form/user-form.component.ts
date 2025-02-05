@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { User } from '../user';
 import { UserService } from '../user.service';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 declare var bootstrap: any;
 
@@ -11,7 +11,7 @@ declare var bootstrap: any;
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.css']
 })
-export class UserFormComponent {
+export class UserFormComponent implements OnInit {
   user: User = {
     id: 0,
     username: '',
@@ -19,74 +19,76 @@ export class UserFormComponent {
     email: '',
     firstName: '',
     lastName: '',
-    role: 'USER',  // Valor por defecto
-    status: 'ACTIVE',  // Valor por defecto
+    role: 'USER',
+    status: 'ACTIVE',
     createdAt: new Date(),
     updatedAt: new Date(),
     isVerified: false,
   };
-  isEditMode = false; // Para saber si estamos editando
+  isEditMode = false;
+  alertMessage: string | null = null;
 
   constructor(
-    private userService: UserService, 
+    private userService: UserService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
     const userId = this.route.snapshot.paramMap.get('id');
-    
     if (userId) {
       this.isEditMode = true;
-      const id = Number(userId);
-      // Llamada a un servicio o lógica para obtener el usuario por id
-      this.loadUser(id);
+      this.loadUser(Number(userId));
     }
   }
- 
-  loadUser(id: number) {
-    // Aquí cargarías el usuario desde tu backend o servicio
-    // Simularemos con los datos existentes
-    const mockUsers: User[] = [
-      { id: 1, username: 'usuario1', email: 'email1@example.com', password: '', firstName: 'Nombre1', lastName: 'Apellido1', role: 'USER', status: 'ACTIVE', createdAt: new Date(), updatedAt: new Date(), isVerified: true },
-      { id: 2, username: 'usuario2', email: 'email2@example.com', password: '', firstName: 'Nombre2', lastName: 'Apellido2', role: 'USER', status: 'ACTIVE', createdAt: new Date(), updatedAt: new Date(), isVerified: true }
-    ];
 
-    const foundUser = mockUsers.find(user => user.id === id);
-    if (foundUser) {
-      this.user = foundUser;
-    }
-  } 
+  loadUser(id: number) {
+    this.userService.getUserById(id).subscribe(
+      user => this.user = user,
+      error => this.alertMessage = 'Error al cargar el usuario'
+    );
+  }
 
   onSubmit() {
-     if (this.isEditMode) {
-      // Lógica para actualizar el usuario
-      console.log('Usuario actualizado', this.user);
+    if (this.isEditMode) {
+      this.userService.updateUser(this.user).subscribe(
+        () => {
+          const navigationExtras: NavigationExtras = {
+            state: { successMessage: 'Usuario actualizado correctamente' }
+          };
+          this.router.navigate(['/users'], navigationExtras);
+        },
+        error => this.alertMessage = 'Error al actualizar el usuario'
+      );
     } else {
-      this.userService.addUser(this.user);
-    }   
-    
-    this.router.navigate(['/users']);  // Redirige de nuevo a la lista de usuarios
+      this.userService.createUser(this.user).subscribe(
+        () => {
+          const navigationExtras: NavigationExtras = {
+            state: { successMessage: 'Usuario creado correctamente' }
+          };
+          this.router.navigate(['/users'], navigationExtras);
+        },
+        error => this.alertMessage = 'Error al crear el usuario'
+      );
+    }
   }
 
-    // Método para abrir el modal de cancelación
-    openCancelModal() {
-      const modalElement = document.getElementById('cancelModal');
-      if (modalElement) {
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
-      }
+  openCancelModal() {
+    const modalElement = document.getElementById('cancelModal');
+    if (modalElement) {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
     }
+  }
 
-    cancel() {
-      const modalElement = document.getElementById('cancelModal');
-      if (modalElement) {
-        const modalInstance = bootstrap.Modal.getInstance(modalElement); // Obtén la instancia del modal
-        if (modalInstance) {
-          modalInstance.hide();
-          this.router.navigate(['/users']);
-        }
+  cancel() {
+    const modalElement = document.getElementById('cancelModal');
+    if (modalElement) {
+      const modalInstance = bootstrap.Modal.getInstance(modalElement);
+      if (modalInstance) {
+        modalInstance.hide();
+        this.router.navigate(['/users']);
       }
     }
+  }
 }
-
