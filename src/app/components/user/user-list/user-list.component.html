@@ -5,14 +5,7 @@
     <button type="button" class="btn btn-primary btn-sm" (click)="newUser()">Nuevo Usuario</button>
   </div>
 
-   <!-- Sección de mensajes -->
-   <div *ngFor="let message of messages">
-    <div [class]="getAlertClass(message.type)">
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-      <strong>{{ message.field }}</strong>
-      {{ message.content }}
-    </div>
-  </div> 
+  <app-alert-messages [messages]="messages"></app-alert-messages>
   
   <div class="table-responsive">
       <table class="table table-hover table-bordered align-middle text-center shadow-sm rounded">
