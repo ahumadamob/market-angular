@@ -56,27 +56,8 @@
           </tr>
         </tbody>
       </table> 
+<app-pagination [totalPages]="totalPages" [currentPage]="page" (pageChange)="changePage($event)"></app-pagination>
 
-    
-<div class="pagination-container">
-  <ul class="pagination">
-    <!-- Botón anterior -->
-    <li class="page-item" [class.disabled]="page === 0">
-      <a class="page-link" (click)="changePage(page - 1)" tabindex="-1">&laquo;</a>
-    </li>
-
-    <!-- Páginas -->
-    <li *ngFor="let p of [].constructor(totalPages); let i = index" 
-        class="page-item" [class.active]="i === page">
-      <a class="page-link" (click)="changePage(i)">{{ i + 1 }}</a>
-    </li>
-
-    <!-- Botón siguiente -->
-    <li class="page-item" [class.disabled]="page === totalPages - 1">
-      <a class="page-link" (click)="changePage(page + 1)" tabindex="-1">&raquo;</a>
-    </li>
-  </ul>
-</div>
 
 
 

@@ -4,11 +4,12 @@ import { User } from '../user';
 import { CommonModule } from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { PaginationComponent } from '../../pagination/pagination.component';
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-user-list',
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, PaginationComponent],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css']
 })
