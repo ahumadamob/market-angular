@@ -15,4 +15,19 @@ export interface User {
     address?: string; // Dirección del usuario (opcional)
     isVerified: boolean; // Verificación de correo/teléfono
   }
+
+  export interface UserForm {
+    id: number;
+    username: string;
+    password: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: 'ADMIN' | 'USER';
+    status: 'ACTIVE' | 'INACTIVE';
+    isVerified: boolean;
+    phoneNumber?: string;
+    address?: string;
+    profilePicture?: string;
+  }
   

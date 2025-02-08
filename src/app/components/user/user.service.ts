@@ -2,7 +2,17 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { User } from './user';
+import { User, UserForm } from './user';
+
+export interface ApiResponse<T> {
+  status: number;
+  messages: {
+    type: string;
+    field?: string;
+    content: string;
+  }[];
+  data: T;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -18,28 +28,46 @@ export class UserService {
     );
   }
 
-  getUserById(id: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${id}`).pipe(
+  getUsersPaginated(page: number, size: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}?page=${page}&size=${size}`).pipe(
       catchError(this.handleError)
     );
   }
+  
 
-  createUser(userData: User): Observable<any> {
-    return this.http.post<any>(this.apiUrl, userData, this.getHttpOptions()).pipe(
-      catchError(this.handleError)
+  getUserById(id: number): Observable<ApiResponse<User>> {
+    return this.http.get<ApiResponse<User>>(`${this.apiUrl}/${id}`);
+  }
+
+  createUser(user: UserForm): Observable<ApiResponse<UserForm>> {
+    return this.http.post<ApiResponse<UserForm>>(this.apiUrl, user, {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    })
+    .pipe(
+      catchError((error: HttpErrorResponse) => {
+        return throwError(() => error);
+      })
     );
   }
 
-  updateUser(user: User): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${user.id}`, user, this.getHttpOptions()).pipe(
-      catchError(this.handleError)
-    );
+  updateUser(user: UserForm): Observable<ApiResponse<UserForm>> {
+    return this.http
+      .put<ApiResponse<UserForm>>(`${this.apiUrl}`, user, {
+        headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      })
+      .pipe(
+        catchError((error: HttpErrorResponse) => throwError(() => error))
+      );
   }
 
-  deleteUser(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
-      catchError(this.handleError)
-    );
+  deleteUser(userId: number): Observable<ApiResponse<null>> {
+    return this.http
+      .delete<ApiResponse<null>>(`${this.apiUrl}/${userId}`)
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          return throwError(() => error);
+        })
+      );
   }
 
   private getHttpOptions() {

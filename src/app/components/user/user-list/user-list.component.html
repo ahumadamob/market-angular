@@ -2,31 +2,30 @@
 
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="text-center text-muted">Usuarios</h2>
-    <button class="btn btn-success rounded-pill" (click)="newUser()">Nuevo Usuario</button>
+    <button type="button" class="btn btn-primary btn-sm" (click)="newUser()">Nuevo Usuario</button>
   </div>
+
+   <!-- Sección de mensajes -->
+   <div *ngFor="let message of messages">
+    <div [class]="getAlertClass(message.type)">
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      <strong>{{ message.field }}</strong>
+      {{ message.content }}
+    </div>
+  </div> 
   
   <div class="table-responsive">
-    <div *ngIf="errorMessage; else userTable">
-      <p>{{ errorMessage }}</p>
-    </div>
-
-  <div *ngIf="successMessage" class="alert alert-dismissible alert-success">
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    <strong>¡Éxito!</strong> {{ successMessage }}
-  </div>    
-
-    <ng-template #userTable>
       <table class="table table-hover table-bordered align-middle text-center shadow-sm rounded">
         <thead>
           <tr class="bg-light">
             <th (click)="sortColumn('id')" class="sortable-column">ID <i class="bi" [ngClass]="getSortIcon('id')"></i></th>
-            <th (click)="sortColumn('username')" class="sortable-column">Username <i class="bi" [ngClass]="getSortIcon('username')"></i></th>
+            <th (click)="sortColumn('username')" class="sortable-column">Usuario <i class="bi" [ngClass]="getSortIcon('username')"></i></th>
             <th (click)="sortColumn('email')" class="sortable-column">Email <i class="bi" [ngClass]="getSortIcon('email')"></i></th>
-            <th (click)="sortColumn('firstName')" class="sortable-column">First Name <i class="bi" [ngClass]="getSortIcon('firstName')"></i></th>
-            <th (click)="sortColumn('lastName')" class="sortable-column">Last Name <i class="bi" [ngClass]="getSortIcon('lastName')"></i></th>
-            <th (click)="sortColumn('role')" class="sortable-column">Role <i class="bi" [ngClass]="getSortIcon('role')"></i></th>
-            <th (click)="sortColumn('status')" class="sortable-column">Status <i class="bi" [ngClass]="getSortIcon('status')"></i></th>
-            <th (click)="sortColumn('createdAt')" class="sortable-column">Created At <i class="bi" [ngClass]="getSortIcon('createdAt')"></i></th>
+            <th (click)="sortColumn('firstName')" class="sortable-column">Nombre <i class="bi" [ngClass]="getSortIcon('firstName')"></i></th>
+            <th (click)="sortColumn('lastName')" class="sortable-column">Apellido <i class="bi" [ngClass]="getSortIcon('lastName')"></i></th>
+            <th (click)="sortColumn('role')" class="sortable-column">Rol <i class="bi" [ngClass]="getSortIcon('role')"></i></th>
+            <th (click)="sortColumn('status')" class="sortable-column">Estado <i class="bi" [ngClass]="getSortIcon('status')"></i></th>
+            <th (click)="sortColumn('createdAt')" class="sortable-column">Creación <i class="bi" [ngClass]="getSortIcon('createdAt')"></i></th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -45,19 +44,45 @@
             </td>
             <td>{{ user.createdAt | date:'shortDate' }}</td>
             <td>
-              <button class="btn btn-primary btn-sm mx-1" (click)="editUser(user.id)">
-                <i class="bi bi-pencil"></i>
-              </button>
-              <button class="btn btn-danger btn-sm mx-1" (click)="openDeleteModal(user.id)">
-                <i class="bi bi-trash"></i>
-              </button>
+              <div class="action-buttons">
+                <button class="btn btn-primary btn-sm mx-1 btn-circle" (click)="editUser(user.id)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-danger btn-sm mx-1 btn-circle" (click)="openDeleteModal(user.id)">
+                  <i class="bi bi-trash"></i>
+                </button>               
+              </div>
             </td>
           </tr>
         </tbody>
-      </table>      
-    </ng-template>
+      </table> 
 
+    
+<div class="pagination-container">
+  <ul class="pagination">
+    <!-- Botón anterior -->
+    <li class="page-item" [class.disabled]="page === 0">
+      <a class="page-link" (click)="changePage(page - 1)" tabindex="-1">&laquo;</a>
+    </li>
+
+    <!-- Páginas -->
+    <li *ngFor="let p of [].constructor(totalPages); let i = index" 
+        class="page-item" [class.active]="i === page">
+      <a class="page-link" (click)="changePage(i)">{{ i + 1 }}</a>
+    </li>
+
+    <!-- Botón siguiente -->
+    <li class="page-item" [class.disabled]="page === totalPages - 1">
+      <a class="page-link" (click)="changePage(page + 1)" tabindex="-1">&raquo;</a>
+    </li>
+  </ul>
+</div>
+
+
+
+    
   </div>
+
 </div>
 
 <!-- Modal de Confirmación para Eliminar -->
@@ -73,7 +98,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-danger" (click)="confirmDelete()">Eliminar</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete(this.userToDeleteId)">Eliminar</button>
       </div>
     </div>
   </div>
