@@ -6,6 +6,7 @@ import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PaginationComponent } from '../../pagination/pagination.component';
 import { AlertMessagesComponent } from '../../alert-messages/alert-messages.component';
+import { SortableTableHeaderComponent } from '../../sortable-table-header/sortable-table-header.component';
 declare var bootstrap: any;
 
 @Component({
@@ -19,6 +20,16 @@ export class UserListComponent implements OnInit {
   errorMessage: string = '';
   successMessage: string | null = null;
   userToDeleteId: number = 0;
+  sortableColumns: { field: keyof User; display: string }[] = [
+    { field: 'id', display: 'ID' },
+    { field: 'username', display: 'Usuario' },
+    { field: 'email', display: 'Email' },
+    { field: 'firstName', display: 'Nombre' },
+    { field: 'lastName', display: 'Apellido' },
+    { field: 'role', display: 'Rol' },
+    { field: 'status', display: 'Estado' },
+    { field: 'createdAt', display: 'Fecha de Creación' }
+  ]; 
   sortDirection: { [key: string]: 'asc' | 'desc' | '' } = {};
   messages: { type: string; field?: string; content: string }[] = [];
 
@@ -138,5 +149,9 @@ export class UserListComponent implements OnInit {
       case 'SUCCESS': return 'alert alert-dismissible alert-success';
       default: return 'alert alert-dismissible alert-secondary'; // Fallback
     }
+  }
+
+  onSortedData(sortedUsers: User[]) {
+    this.users = sortedUsers;
   }
 }

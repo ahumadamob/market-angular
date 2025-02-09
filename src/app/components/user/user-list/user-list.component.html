@@ -5,21 +5,29 @@
     <button type="button" class="btn btn-primary btn-sm" (click)="newUser()">Nuevo Usuario</button>
   </div>
 
+  <!-- Sección de Mensajes -->
   <app-alert-messages [messages]="messages"></app-alert-messages>
-  
+
   <div class="table-responsive">
+    <div *ngIf="errorMessage; else userTable">
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <ng-template #userTable>
       <table class="table table-hover table-bordered align-middle text-center shadow-sm rounded">
         <thead>
-          <tr class="bg-light">
-            <th (click)="sortColumn('id')" class="sortable-column">ID <i class="bi" [ngClass]="getSortIcon('id')"></i></th>
-            <th (click)="sortColumn('username')" class="sortable-column">Usuario <i class="bi" [ngClass]="getSortIcon('username')"></i></th>
-            <th (click)="sortColumn('email')" class="sortable-column">Email <i class="bi" [ngClass]="getSortIcon('email')"></i></th>
-            <th (click)="sortColumn('firstName')" class="sortable-column">Nombre <i class="bi" [ngClass]="getSortIcon('firstName')"></i></th>
-            <th (click)="sortColumn('lastName')" class="sortable-column">Apellido <i class="bi" [ngClass]="getSortIcon('lastName')"></i></th>
-            <th (click)="sortColumn('role')" class="sortable-column">Rol <i class="bi" [ngClass]="getSortIcon('role')"></i></th>
-            <th (click)="sortColumn('status')" class="sortable-column">Estado <i class="bi" [ngClass]="getSortIcon('status')"></i></th>
-            <th (click)="sortColumn('createdAt')" class="sortable-column">Creación <i class="bi" [ngClass]="getSortIcon('createdAt')"></i></th>
-            <th>Actions</th>
+          <tr>
+            <ng-container *ngFor="let col of sortableColumns">
+              <th (click)="sortColumn(col.field)">
+                {{ col.display }}
+                <i class="bi" [ngClass]="{
+                  'bi-arrow-down': sortDirection[col.field] === 'asc',
+                  'bi-arrow-up': sortDirection[col.field] === 'desc',
+                  'bi-arrow-down-up': !sortDirection[col.field]
+                }"></i>
+              </th>
+            </ng-container>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -37,7 +45,7 @@
             </td>
             <td>{{ user.createdAt | date:'shortDate' }}</td>
             <td>
-              <div class="action-buttons">
+              <div class="action-buttons d-flex justify-content-center">
                 <button class="btn btn-primary btn-sm mx-1 btn-circle" (click)="editUser(user.id)">
                   <i class="bi bi-pencil"></i>
                 </button>
@@ -49,14 +57,17 @@
           </tr>
         </tbody>
       </table> 
-<app-pagination [totalPages]="totalPages" [currentPage]="page" (pageChange)="changePage($event)"></app-pagination>
+      
+      <!-- Paginador -->
+      <app-pagination 
+        [currentPage]="page"
+        [totalPages]="totalPages"
+        (pageChange)="changePage($event)">
+      </app-pagination>
 
-
-
-
-    
+    </ng-template>
   </div>
-
+  
 </div>
 
 <!-- Modal de Confirmación para Eliminar -->
@@ -65,14 +76,14 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
         ¿Estás seguro que deseas eliminar este usuario?
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-danger" (click)="confirmDelete(this.userToDeleteId)">Eliminar</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete(userToDeleteId)">Eliminar</button>
       </div>
     </div>
   </div>
