@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { UserService } from '../user.service';
 import { User } from '../user';
 import { CommonModule } from '@angular/common';
@@ -7,19 +7,22 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { PaginationComponent } from '../../pagination/pagination.component';
 import { AlertMessagesComponent } from '../../alert-messages/alert-messages.component';
 import { SortableTableHeaderComponent } from '../../sortable-table-header/sortable-table-header.component';
+import { ConfirmationModalComponent } from '../../confirmation-modal/confirmation-modal.component';
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-user-list',
-  imports: [CommonModule, DatePipe, PaginationComponent, AlertMessagesComponent],
+  imports: [CommonModule, DatePipe, PaginationComponent, AlertMessagesComponent, ConfirmationModalComponent],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css']
 })
 export class UserListComponent implements OnInit {
+  @ViewChild(ConfirmationModalComponent) confirmationModal!: ConfirmationModalComponent; 
+
   users: User[] = [];
   errorMessage: string = '';
   successMessage: string | null = null;
-  userToDeleteId: number = 0;
+
   sortableColumns: { field: keyof User; display: string }[] = [
     { field: 'id', display: 'ID' },
     { field: 'username', display: 'Usuario' },
@@ -36,6 +39,10 @@ export class UserListComponent implements OnInit {
   page: number = 0;
   itemsPerPage: number = 10;
   totalPages: number = 0;
+
+  isModalOpen = false;
+  userToDeleteId: number = 0;
+
 
   constructor(private userService: UserService, private router: Router, private route: ActivatedRoute) {
     ['id', 'username', 'email', 'firstName', 'lastName', 'role', 'status', 'createdAt'].forEach(col => {
@@ -110,34 +117,38 @@ export class UserListComponent implements OnInit {
 
   openDeleteModal(userId: number) {
     this.userToDeleteId = userId;
-    const modalElement = document.getElementById('deleteModal');
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
+    if (this.confirmationModal) {
+      this.confirmationModal.show(); // Llama a la función del componente hijo
+    }
   }
 
   confirmDelete(id: number) {
-    this.userService.deleteUser(id).subscribe({
-      next: (response) => {
-        if (response.status === 200) {
-          // El servidor indica éxito en el borrado
-          // Vuelves a cargar la lista o quitas el usuario localmente
-          this.users = this.users.filter(u => u.id !== id);
-                  // Reinicia la variable
-        this.userToDeleteId = 0;
+    if (this.userToDeleteId !== null) {
+      this.userService.deleteUser(id).subscribe({
+        next: (response) => {
+          if (response.status === 200) {
+            // El servidor indica éxito en el borrado
+            // Vuelves a cargar la lista o quitas el usuario localmente
+            this.users = this.users.filter(u => u.id !== id);
+                    // Reinicia la variable
+          this.userToDeleteId = 0;
+  
+          // Cierra el modal
+          const modalElement = document.getElementById('deleteModal');
+          const modalInstance = bootstrap.Modal.getInstance(modalElement);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
+          }
+        },
+        error: (err) => {
+          this.errorMessage = 'Error al eliminar usuario.';
+          console.error('Error en DELETE:', err);
+        }
+      });
+      this.isModalOpen = false;
+    }
 
-        // Cierra el modal
-        const modalElement = document.getElementById('deleteModal');
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
-        }
-      },
-      error: (err) => {
-        this.errorMessage = 'Error al eliminar usuario.';
-        console.error('Error en DELETE:', err);
-      }
-    });
   }
 
   

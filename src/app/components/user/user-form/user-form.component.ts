@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { User, UserForm } from '../user';
 import { UserService } from '../user.service';
-import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiResponse } from '../user.service';
+
 declare var bootstrap: any;
 
 @Component({
