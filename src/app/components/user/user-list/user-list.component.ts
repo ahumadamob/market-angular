@@ -4,10 +4,10 @@ import { User } from '../user';
 import { CommonModule } from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PaginationComponent } from '../../pagination/pagination.component';
-import { AlertMessagesComponent } from '../../alert-messages/alert-messages.component';
-import { SortableTableHeaderComponent } from '../../sortable-table-header/sortable-table-header.component';
-import { ConfirmationModalComponent } from '../../confirmation-modal/confirmation-modal.component';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
+import { AlertMessagesComponent } from '../../shared/alert-messages/alert-messages.component';
+import { SortableTableHeaderComponent } from '../../shared/sortable-table-header/sortable-table-header.component';
+import { ConfirmationModalComponent } from '../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 declare var bootstrap: any;
 
 @Component({

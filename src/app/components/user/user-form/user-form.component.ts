@@ -5,18 +5,24 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, FormBuilder, FormGroup, Validator } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiResponse } from '../user.service';
-import { FormValidationComponent } from '../../form-validation/form-validation.component';
-import { ErrorResponse } from '../../form-validation/error-response.interface';
+import { FormValidationComponent } from '../../shared/form-validation/form-validation.component';
+import { ErrorResponse } from '../../shared/form-validation/error-response.interface';
+import { ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { QuitFormConfirmationModalComponent } from '../../shared/quit-form-confirmation-modal/quit-form-confirmation-modal.component';
+
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-user-form',
-  imports: [FormsModule, FormValidationComponent],
+  imports: [FormsModule, FormValidationComponent, QuitFormConfirmationModalComponent],
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.css']
 })
+
 export class UserFormComponent implements OnInit {
+  @ViewChild('userForm') userFormRef!: NgForm;
   userForm: FormGroup = new FormGroup({}); // Asegurar que no sea undefined
   user: UserForm = {
     id: 0,
@@ -72,6 +78,7 @@ export class UserFormComponent implements OnInit {
       },
       error: (error) => {
         // Manejar error (400, 404, etc.)
+        console.error('Va a dispararse en handleError')
         this.handleError(error);
       },
     });
@@ -86,6 +93,7 @@ export class UserFormComponent implements OnInit {
           }
         },
         error: (error) => {
+          console.error('Va a dispararse en handleError')
           // Manejo de error
           this.handleError(error);
         },
@@ -96,7 +104,8 @@ export class UserFormComponent implements OnInit {
   errorResponse: ErrorResponse | null = null;
 
   handleError(errorResponse: any): void {
-    console.debug("errorResponse:", errorResponse);
+    console.error("ahora se ejecuta en handleError");
+    console.error('Respuesta del error del Backend', errorResponse);
     if (errorResponse.status === 400 && errorResponse.error.messages) {
       this.errorResponse = errorResponse.error;
     }
@@ -172,15 +181,13 @@ export class UserFormComponent implements OnInit {
     }
   }
 
-  cancel() {
-    const modalElement = document.getElementById('cancelModal');
-    if (modalElement) {
-      const modalInstance = bootstrap.Modal.getInstance(modalElement);
-      if (modalInstance) {
-        modalInstance.hide();
-        this.router.navigate(['/users']);
-      }
-    }
+  onCancelClosed(): void {
+    console.log('Modal cerrado sin confirmar.');
+  }
+
+  cancel(): void {
+    console.log('Acción confirmada: Descartar cambios.');
+    this.router.navigate(['/users']);
   }
 
 }
