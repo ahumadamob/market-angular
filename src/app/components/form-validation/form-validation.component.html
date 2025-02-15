@@ -1,0 +1,9 @@
+<div *ngFor="let field of formFields">
+    <div *ngIf="form.controls[field].errors?.['backendError']" class="invalid-feedback d-block">
+      {{ form.controls[field].errors?.['backendError'] }}
+    </div>
+  </div>
+  
+  
+  
+  

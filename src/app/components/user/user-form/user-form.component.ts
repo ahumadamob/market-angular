@@ -2,19 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { User, UserForm } from '../user';
 import { UserService } from '../user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, FormBuilder, FormGroup, Validator } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiResponse } from '../user.service';
+import { FormValidationComponent } from '../../form-validation/form-validation.component';
+import { ErrorResponse } from '../../form-validation/error-response.interface';
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-user-form',
-  imports: [FormsModule],
+  imports: [FormsModule, FormValidationComponent],
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.css']
 })
 export class UserFormComponent implements OnInit {
+  userForm: FormGroup = new FormGroup({}); // Asegurar que no sea undefined
   user: UserForm = {
     id: 0,
     username: '',
@@ -42,6 +45,7 @@ export class UserFormComponent implements OnInit {
       this.isEditMode = true;
       this.loadUser(Number(userId));
     }
+    this.errorResponse = null; // ✅ Inicializar errorResponse
   }
 
   loadUser(id: number) {
@@ -89,7 +93,17 @@ export class UserFormComponent implements OnInit {
     }
   }
 
+  errorResponse: ErrorResponse | null = null;
 
+  handleError(errorResponse: any): void {
+    console.debug("errorResponse:", errorResponse);
+    if (errorResponse.status === 400 && errorResponse.error.messages) {
+      this.errorResponse = errorResponse.error;
+    }
+  }
+  
+
+  /*
   handleError(error: HttpErrorResponse) {
     this.clearValidationErrors();
   
@@ -132,6 +146,7 @@ export class UserFormComponent implements OnInit {
       this.alertMessage = 'Ocurrió un error inesperado. Por favor, inténtalo nuevamente más tarde.';
     }
   }
+    */
 
   private clearValidationErrors() {
     // Selecciona todos los inputs o selects marcados como .is-invalid
