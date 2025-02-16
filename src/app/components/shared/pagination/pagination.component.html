@@ -1,0 +1,19 @@
+<div class="pagination-container">
+  <ul class="pagination">
+    <li class="page-item" [class.disabled]="currentPage === 0" (click)="changePage(currentPage - 1)">
+      <a class="page-link">&laquo;</a>
+    </li>
+
+    <li *ngFor="let p of [].constructor(totalPages); let i = index" 
+        (click)="changePage(i)" 
+        class="page-item" 
+        [class.active]="currentPage === i">
+      <a class="page-link">{{ i + 1 }}</a>
+    </li>
+
+    <li class="page-item" [class.disabled]="currentPage === totalPages - 1" (click)="changePage(currentPage + 1)">
+      <a class="page-link">&raquo;</a>
+    </li>
+  </ul>
+</div>
+

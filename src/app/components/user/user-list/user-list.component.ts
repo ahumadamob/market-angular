@@ -1,80 +1,149 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { UserService } from '../user.service';
 import { User } from '../user';
 import { CommonModule } from '@angular/common';
 import { DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { PaginationComponent } from '../../shared/pagination/pagination.component';
+import { AlertMessagesComponent } from '../../shared/alert-messages/alert-messages.component';
+import { SortableTableHeaderComponent } from '../../shared/sortable-table-header/sortable-table-header.component';
+import { ConfirmationModalComponent } from '../../shared/delete-confirmation-modal/delete-confirmation-modal.component';
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-user-list',
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, PaginationComponent, AlertMessagesComponent, ConfirmationModalComponent,SortableTableHeaderComponent],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css']
 })
 export class UserListComponent implements OnInit {
-  users: User[] = [];
-  userToDeleteId: number | null = null;
-  sortDirection: { [key: string]: 'asc' | 'desc' | '' } = {};
-
-  constructor(private userService: UserService, private router: Router) {
-    ['id', 'username', 'email', 'firstName', 'lastName', 'role', 'status', 'createdAt'].forEach(col => {
-      this.sortDirection[col] = '';
-    });   
-  }
-
-  sortColumn(column: keyof User) {
-    this.sortDirection[column] = this.sortDirection[column] === 'asc' ? 'desc' : 'asc';
-    const direction = this.sortDirection[column] === 'asc' ? 1 : -1;
   
-    this.users.sort((a, b) => {
-      const valueA = a[column] ?? ''; // Usamos '??' para asignar un valor por defecto si es undefined
-      const valueB = b[column] ?? '';
-  
-      if (valueA < valueB) return -1 * direction;
-      if (valueA > valueB) return 1 * direction;
-      return 0;
-    });
-  }
-  
-  
-  getSortIcon(column: string): string {
-    return this.sortDirection[column] === 'asc' ? 'bi-arrow-down' : this.sortDirection[column] === 'desc' ? 'bi-arrow-up' : 'bi-arrow-down-up';
-  }
+  @ViewChild(ConfirmationModalComponent) confirmationModal!: ConfirmationModalComponent; 
 
   ngOnInit(): void {
-    this.users = this.userService.getUsers();
+    if (history.state?.messages) {
+      this.messages = history.state.messages;
+      console.info(this.messages)
+    }
+    this.loadUsers();
   }
+
+  constructor(private userService: UserService, private router: Router) {
+  }
+
+  /**
+   * SortableTableHeader
+   */
+  sortableColumns: { field: keyof User; display: string }[] = [
+    { field: 'id', display: 'ID' },
+    { field: 'username', display: 'Usuario' },
+    { field: 'email', display: 'Email' },
+    { field: 'firstName', display: 'Nombre' },
+    { field: 'lastName', display: 'Apellido' },
+    { field: 'role', display: 'Rol' },
+    { field: 'status', display: 'Estado' },
+    { field: 'createdAt', display: 'Fecha de Creación' }
+  ];
+
+  updateSortedData(sortedUsers: User[]): void {
+    this.users = sortedUsers;
+  }
+
+  onSortedData(sortedUsers: User[]) {
+    this.users = sortedUsers;
+  }
+
+  /**
+   * Pagination
+   */
+  page: number = 0;
+  itemsPerPage: number = 10;
+  totalPages: number = 0;
+
+  changePage(newPage: number) {
+    if (newPage >= 0 && newPage < this.totalPages) {
+      this.page = newPage;
+      this.loadUsers();
+    }
+  }
+
+  /**
+   * AlertMessages
+   */
+  errorMessage: string = '';
+  successMessage: string | null = null;
+  messages: { type: string; field?: string; content: string }[] = [];
+  isModalOpen = false;
+
+
+  /**
+   * List
+   */
+  users: User[] = []; 
+
+  loadUsers(): void {
+    this.userService.getUsersPaginated(this.page, this.itemsPerPage).subscribe(
+      response => {
+        if (response.status === 200) {
+          this.users = response.data.content;
+          this.totalPages = response.data.totalPages;
+        }
+      },
+      error => {
+        this.errorMessage = 'Error al cargar los usuarios';
+      }
+    );
+  }
+
+  /**
+   * New
+   */
 
   newUser() {
-    this.router.navigate(['/users/new']);  // Ruta hacia el formulario
+    this.router.navigate(['/users/new']);
   }
-  
-  
-  editUser(userId: number) {
-    this.router.navigate([`/users/edit`, userId]);
-  }
-    // Abrir el modal para confirmar la eliminación
-    openDeleteModal(index: number) {
-      this.userToDeleteId = index; // Almacena el índice del usuario a eliminar
-      const modalElement = document.getElementById('deleteModal');
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    }
-  
-    confirmDelete() {
-      if (this.userToDeleteId !== null) {
-        // Eliminar el usuario por ID
-        this.users = this.users.filter(user => user.id !== this.userToDeleteId);
-        this.userToDeleteId = null; // Reiniciar el ID
-  
-        // Cierra el modal después de eliminar
-        const modalElement = document.getElementById('deleteModal');
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
-      }
-    }
-}
 
+  /**
+   * Edit
+   */
+
+  editUser(userId: number) {
+    this.router.navigate(['/users', 'edit', userId]);
+  }
+
+  /**
+   * Delete
+   */
+  userToDeleteId: number = 0;
+
+  openDeleteModal(userId: number) {
+    this.userToDeleteId = userId;
+    if (this.confirmationModal) {
+      this.confirmationModal.show(); // Llama a la función del componente hijo
+    }
+  }
+
+  confirmDelete(id: number) {
+    if (this.userToDeleteId !== null) {
+      this.userService.deleteUser(id).subscribe({
+        next: (response) => {
+          if (response.status === 200) {
+            this.users = this.users.filter(u => u.id !== id);
+            this.userToDeleteId = 0;
+            const modalElement = document.getElementById('deleteModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+              modalInstance.hide();
+            }
+          }
+        },
+        error: (err) => {
+          this.errorMessage = 'Error al eliminar usuario.';
+          console.error('Error en DELETE:', err);
+        }
+      });
+      this.isModalOpen = false;
+    }
+  }
+
+}

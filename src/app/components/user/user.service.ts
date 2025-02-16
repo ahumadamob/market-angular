@@ -1,198 +1,90 @@
 import { Injectable } from '@angular/core';
-import { User } from './user';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { User, UserForm } from './user';
+
+export interface ApiResponse<T> {
+  status: number;
+  messages: {
+    type: string;
+    field?: string;
+    content: string;
+  }[];
+  data: T;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
-  // Datos de usuarios en memoria
-  private users: User[] = [
-    {
-      id: 1,
-      username: 'jdoe',
-      password: 'password123',
-      email: 'jdoe@example.com',
-      firstName: 'John',
-      lastName: 'Doe',
-      role: 'USER',
-      status: 'ACTIVE',
-      createdAt: new Date('2025-01-01'),
-      updatedAt: new Date('2025-01-10'),
-      lastLogin: new Date('2025-01-15'),
-      profilePicture: 'https://example.com/profiles/jdoe.jpg',
-      phoneNumber: '+54 261 1234567',
-      address: 'Calle Falsa 123, Mendoza',
-      isVerified: true,
-    },
-    {
-      id: 2,
-      username: 'mrios',
-      password: 'securepass',
-      email: 'mrios@example.com',
-      firstName: 'María',
-      lastName: 'Ríos',
-      role: 'ADMIN',
-      status: 'ACTIVE',
-      createdAt: new Date('2025-01-02'),
-      updatedAt: new Date('2025-01-10'),
-      lastLogin: new Date('2025-01-12'),
-      profilePicture: 'https://example.com/profiles/mrios.jpg',
-      phoneNumber: '+54 261 7654321',
-      address: 'Av. Siempre Viva 456, Mendoza',
-      isVerified: true,
-    },
-    {
-      id: 3,
-      username: 'fperez',
-      password: 'fperez!23',
-      email: 'fperez@example.com',
-      firstName: 'Francisco',
-      lastName: 'Pérez',
-      role: 'USER',
-      status: 'INACTIVE',
-      createdAt: new Date('2025-01-03'),
-      updatedAt: new Date('2025-01-08'),
-      lastLogin: new Date('2025-01-10'),
-      profilePicture: 'https://example.com/profiles/fperez.jpg',
-      phoneNumber: '+54 261 7891234',
-      address: 'Calle Los Andes 789, Mendoza',
-      isVerified: false,
-    },
-    {
-      id: 4,
-      username: 'claura',
-      password: 'claura!456',
-      email: 'claura@example.com',
-      firstName: 'Clara',
-      lastName: 'Laura',
-      role: 'ADMIN',
-      status: 'ACTIVE',
-      createdAt: new Date('2025-01-04'),
-      updatedAt: new Date('2025-01-09'),
-      lastLogin: new Date('2025-01-14'),
-      profilePicture: 'https://example.com/profiles/claura.jpg',
-      phoneNumber: '+54 261 9876543',
-      address: 'Calle San Martín 123, Mendoza',
-      isVerified: true,
-    },
-    {
-      id: 5,
-      username: 'lgomez',
-      password: 'gomez$12',
-      email: 'lgomez@example.com',
-      firstName: 'Luis',
-      lastName: 'Gómez',
-      role: 'USER',
-      status: 'ACTIVE',
-      createdAt: new Date('2025-01-05'),
-      updatedAt: new Date('2025-01-11'),
-      lastLogin: new Date('2025-01-16'),
-      profilePicture: 'https://example.com/profiles/lgomez.jpg',
-      phoneNumber: '+54 261 1472583',
-      address: 'Calle Belgrano 567, Mendoza',
-      isVerified: true,
-    },
-    // Agrega otros 20 usuarios aquí...
-    {
-      id: 6,
-      username: 'jmendez',
-      password: 'jmendezpass',
-      email: 'jmendez@example.com',
-      firstName: 'Juan',
-      lastName: 'Méndez',
-      role: 'USER',
-      status: 'INACTIVE',
-      createdAt: new Date('2025-01-06'),
-      updatedAt: new Date('2025-01-13'),
-      lastLogin: new Date('2025-01-17'),
-      profilePicture: 'https://example.com/profiles/jmendez.jpg',
-      phoneNumber: '+54 261 4567891',
-      address: 'Calle Las Heras 234, Mendoza',
-      isVerified: false,
-    },
-    {
-      id: 7,
-      username: 'mflores',
-      password: 'florespass',
-      email: 'mflores@example.com',
-      firstName: 'María',
-      lastName: 'Flores',
-      role: 'USER',
-      status: 'ACTIVE',
-      createdAt: new Date('2025-01-07'),
-      updatedAt: new Date('2025-01-13'),
-      lastLogin: new Date('2025-01-17'),
-      profilePicture: 'https://example.com/profiles/mflores.jpg',
-      phoneNumber: '+54 261 6547893',
-      address: 'Calle Libertador 765, Mendoza',
-      isVerified: true,
-    },
-    {
-      id: 8,
-      username: 'cramirez',
-      password: 'cramirez!34',
-      email: 'cramirez@example.com',
-      firstName: 'Carlos',
-      lastName: 'Ramírez',
-      role: 'ADMIN',
-      status: 'ACTIVE',
-      createdAt: new Date('2025-01-08'),
-      updatedAt: new Date('2025-01-15'),
-      lastLogin: new Date('2025-01-18'),
-      profilePicture: 'https://example.com/profiles/cramirez.jpg',
-      phoneNumber: '+54 261 7894561',
-      address: 'Calle Chile 987, Mendoza',
-      isVerified: true,
-    },
-    {
-      id: 9,
-      username: 'fbustos',
-      password: 'bustospass123',
-      email: 'fbustos@example.com',
-      firstName: 'Felipe',
-      lastName: 'Bustos',
-      role: 'USER',
-      status: 'INACTIVE',
-      createdAt: new Date('2025-01-09'),
-      updatedAt: new Date('2025-01-16'),
-      lastLogin: new Date('2025-01-19'),
-      profilePicture: 'https://example.com/profiles/fbustos.jpg',
-      phoneNumber: '+54 261 9517532',
-      address: 'Calle Guaymallen 432, Mendoza',
-      isVerified: false,
-    },
-    {
-      id: 10,
-      username: 'avazquez',
-      password: 'vazquez$45',
-      email: 'avazquez@example.com',
-      firstName: 'Ana',
-      lastName: 'Vázquez',
-      role: 'ADMIN',
-      status: 'ACTIVE',
-      createdAt: new Date('2025-01-10'),
-      updatedAt: new Date('2025-01-17'),
-      lastLogin: new Date('2025-01-20'),
-      profilePicture: 'https://example.com/profiles/avazquez.jpg',
-      phoneNumber: '+54 261 2586547',
-      address: 'Calle Junín 876, Mendoza',
-      isVerified: true,
-    },
-    // Otros 15 usuarios...
-  ];
+  private apiUrl = 'http://localhost:8080/api/user';
 
-  // Método para obtener todos los usuarios
-  getUsers(): User[] {
-    return this.users;
+  constructor(private http: HttpClient) {}
+
+  getUsers(): Observable<any> {
+    return this.http.get<any>(this.apiUrl).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  // Método para obtener un usuario por su id
-  getUserById(id: number): User | undefined {
-    return this.users.find(user => user.id === id);
+  getUsersPaginated(page: number, size: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}?page=${page}&size=${size}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+  
+
+  getUserById(id: number): Observable<ApiResponse<User>> {
+    return this.http.get<ApiResponse<User>>(`${this.apiUrl}/${id}`);
   }
 
-  addUser(user: User) {
-    user.id = this.users.length + 1;  // Asignar un ID único
-    this.users.push(user);
-  }  
+  createUser(user: UserForm): Observable<ApiResponse<UserForm>> {
+    return this.http.post<ApiResponse<UserForm>>(this.apiUrl, user, {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+    })
+    .pipe(
+      catchError((error: HttpErrorResponse) => {
+        return throwError(() => error);
+      })
+    );
+  }
+
+  updateUser(user: UserForm): Observable<ApiResponse<UserForm>> {
+    return this.http
+      .put<ApiResponse<UserForm>>(`${this.apiUrl}`, user, {
+        headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+      })
+      .pipe(
+        catchError((error: HttpErrorResponse) => throwError(() => error))
+      );
+  }
+
+  deleteUser(userId: number): Observable<ApiResponse<null>> {
+    return this.http
+      .delete<ApiResponse<null>>(`${this.apiUrl}/${userId}`)
+      .pipe(
+        catchError((error: HttpErrorResponse) => {
+          return throwError(() => error);
+        })
+      );
+  }
+
+  private getHttpOptions() {
+    return {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+    };
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    let errorMessage = 'Ocurrió un error en la solicitud';
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      errorMessage = `Código de error: ${error.status}, mensaje: ${error.message}`;
+    }
+    return throwError(errorMessage);
+  }
 }

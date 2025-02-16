@@ -1,18 +1,40 @@
-<nav class="navbar-container bg-light p-3 border-bottom">
-    <ul class="navbar d-flex justify-content-start">
-      <!-- Menú Administración con submenú -->
-      <li class="nav-item dropdown me-3 position-relative">
-        <a href="#" class="nav-link dropdown-toggle" (click)="toggleDropdown('adminDropdown')">Administración</a>
-        <ul [class.show]="dropdowns['adminDropdown']" class="dropdown-menu position-absolute">
-          <li><a routerLink="/users"  class="dropdown-item">Usuarios</a></li>
-          <li><a href="#" class="dropdown-item">Categorías</a></li>
-          <li><a href="#" class="dropdown-item">Productos</a></li>
-        </ul>
-      </li>
-      <!-- Otros Items -->
-      <li class="nav-item me-3"><a href="#" class="nav-link">Item B</a></li>
-      <li class="nav-item me-3"><a href="#" class="nav-link">Item C</a></li>
-      <li class="nav-item"><a href="#" class="nav-link">Item D</a></li>
-    </ul>
-  </nav>
-  
+<nav class="navbar navbar-expand-lg bg-light p-3 border-bottom">
+  <div class="container-fluid">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu" aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarMenu">
+      <ul class="navbar-nav me-auto">
+        <!-- Menú Administración con submenú -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Administración
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+            <li><a routerLink="/users" class="dropdown-item">Usuarios</a></li>
+            <li><a href="#" class="dropdown-item">Categorías</a></li>
+            <li><a href="#" class="dropdown-item">Productos</a></li>
+          </ul>
+        </li>
+        <!-- Otros Items -->
+        <li class="nav-item">
+          <a class="nav-link" href="#">Item B</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Item C</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Item D</a>
+        </li>
+      </ul>
+
+      <!-- Formulario de búsqueda -->
+      <form class="d-flex">
+        <input class="form-control me-2" type="search" placeholder="Search">
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+</nav>
+

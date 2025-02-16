@@ -1,20 +1,41 @@
-<header class="header-container bg-light p-3 border-bottom">
-    <div class="container d-flex justify-content-between align-items-center">
-      <!-- Logo o Título -->
-      <div class="logo">
-        <h1>Mi Aplicación</h1>
-      </div>
-      <!-- Información del usuario -->
-      <div class="user-info d-flex align-items-center">
-        <div class="user-avatar me-2">
-          <!-- Imagen de perfil -->
-          <img src="https://via.placeholder.com/40" alt="Avatar" class="rounded-circle">
-        </div>
-        <div class="user-details">
-          <!-- Nombre del usuario -->
-          <span class="user-name fw-bold">Usuario Logueado</span>
-        </div>
+  <nav class="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" >Navbar</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor02" aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarColor02">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link active" >Home
+              <span class="visually-hidden">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" >Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" >Pricing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" >About</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Administración</a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item" (click)="goToUsers()">Usuarios</a>
+              <a class="dropdown-item" >Another action</a>
+              <a class="dropdown-item" >Something else here</a>
+              <div class="dropdown-divider"></div>
+              <a class="dropdown-item" >Separated link</a>
+            </div>
+          </li>
+        </ul>
+        <form class="d-flex">
+          <input class="form-control me-sm-2" type="search" placeholder="Search">
+          <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+        </form>
       </div>
     </div>
-  </header>
+  </nav>
   

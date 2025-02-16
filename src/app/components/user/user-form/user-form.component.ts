@@ -1,92 +1,111 @@
-import { Component } from '@angular/core';
-import { User } from '../user';
+import { Component, OnInit } from '@angular/core';
+import { UserForm } from '../user';
 import { UserService } from '../user.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, FormGroup } from '@angular/forms';
+import { ApiResponse } from '../user.service';
+import { FormValidationComponent } from '../../shared/form-validation/form-validation.component';
+import { ErrorResponse } from '../../shared/form-validation/error-response.interface';
+import { ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { QuitFormConfirmationModalComponent } from '../../shared/quit-form-confirmation-modal/quit-form-confirmation-modal.component';
+
+
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-user-form',
-  imports: [FormsModule],
+  imports: [FormsModule, FormValidationComponent, QuitFormConfirmationModalComponent],
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.css']
 })
-export class UserFormComponent {
-  user: User = {
+
+export class UserFormComponent implements OnInit {
+  @ViewChild('userForm') userFormRef!: NgForm;
+  userForm: FormGroup = new FormGroup({}); // Asegurar que no sea undefined
+  user: UserForm = {
     id: 0,
     username: '',
     password: '',
     email: '',
     firstName: '',
     lastName: '',
-    role: 'USER',  // Valor por defecto
-    status: 'ACTIVE',  // Valor por defecto
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    role: 'USER',
+    status: 'ACTIVE',
     isVerified: false,
   };
-  isEditMode = false; // Para saber si estamos editando
+  isEditMode = false;
+  alertMessage: string | null = null;
 
   constructor(
-    private userService: UserService, 
+    private userService: UserService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
     const userId = this.route.snapshot.paramMap.get('id');
-    
     if (userId) {
       this.isEditMode = true;
-      const id = Number(userId);
-      // Llamada a un servicio o lógica para obtener el usuario por id
-      this.loadUser(id);
+      this.loadUser(Number(userId));
     }
+    this.errorResponse = null;
   }
- 
-  loadUser(id: number) {
-    // Aquí cargarías el usuario desde tu backend o servicio
-    // Simularemos con los datos existentes
-    const mockUsers: User[] = [
-      { id: 1, username: 'usuario1', email: 'email1@example.com', password: '', firstName: 'Nombre1', lastName: 'Apellido1', role: 'USER', status: 'ACTIVE', createdAt: new Date(), updatedAt: new Date(), isVerified: true },
-      { id: 2, username: 'usuario2', email: 'email2@example.com', password: '', firstName: 'Nombre2', lastName: 'Apellido2', role: 'USER', status: 'ACTIVE', createdAt: new Date(), updatedAt: new Date(), isVerified: true }
-    ];
 
-    const foundUser = mockUsers.find(user => user.id === id);
-    if (foundUser) {
-      this.user = foundUser;
-    }
-  } 
+  loadUser(id: number) {
+    this.userService.getUserById(id).subscribe({
+      next: (response) => {
+        this.user = response.data;
+      },
+      error: (err) => {
+      }
+    });
+  }
 
   onSubmit() {
-     if (this.isEditMode) {
-      // Lógica para actualizar el usuario
-      console.log('Usuario actualizado', this.user);
+    if (this.isEditMode) {
+    this.userService.updateUser(this.user).subscribe({
+      next: (response) => {
+        if (response.status === 200) {
+          this.router.navigate(['/users'], { 
+            state: { messages: response.messages }
+          });
+        }
+      },
+      error: (error) => {
+        this.handleError(error);
+      },
+    });
+
     } else {
-      this.userService.addUser(this.user);
-    }   
-    
-    this.router.navigate(['/users']);  // Redirige de nuevo a la lista de usuarios
+      this.userService.createUser(this.user).subscribe({
+        next: (response: ApiResponse<UserForm>) => {
+          if (response.status === 201) {
+            this.router.navigate(['/users'], { 
+              state: { messages: response.messages } // Pasamos los mensajes a UserListComponent
+            });
+          }
+        },
+        error: (error) => {
+          this.handleError(error);
+        },
+      });
+    }
   }
 
-    // Método para abrir el modal de cancelación
-    openCancelModal() {
-      const modalElement = document.getElementById('cancelModal');
-      if (modalElement) {
-        const modal = new bootstrap.Modal(modalElement);
-        modal.show();
-      }
-    }
+  errorResponse: ErrorResponse | null = null;
 
-    cancel() {
-      const modalElement = document.getElementById('cancelModal');
-      if (modalElement) {
-        const modalInstance = bootstrap.Modal.getInstance(modalElement); // Obtén la instancia del modal
-        if (modalInstance) {
-          modalInstance.hide();
-          this.router.navigate(['/users']);
-        }
-      }
+  handleError(errorResponse: any): void {
+    if (errorResponse.status === 400 && errorResponse.error.messages) {
+      this.errorResponse = errorResponse.error;
     }
+  }
+
+  onCancelClosed(): void {
+  }
+
+  cancel(): void {
+    this.router.navigate(['/users']);
+  }
+
 }
-

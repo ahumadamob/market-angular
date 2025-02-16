@@ -1,0 +1,21 @@
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    background: #fff;
+    padding: 10px;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .page-item .page-link {
+    cursor: pointer;
+  }
+  
+  .page-item.disabled {
+    opacity: 0.9; 
+    pointer-events: none; 
+  } 
