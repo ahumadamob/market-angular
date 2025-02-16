@@ -1,21 +1,19 @@
+// sortable-table-header.component.ts
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
-  selector: 'app-sortable-table-header',
-  standalone: true,
+  selector: '[appSortableTableHeader]',
   imports: [CommonModule],
   templateUrl: './sortable-table-header.component.html',
   styleUrls: ['./sortable-table-header.component.css']
 })
 export class SortableTableHeaderComponent<T> {
-  @Input() data: T[] = []; // Recibe los datos genéricos
-  @Input() sortableColumns: { field: keyof T; display: string }[] = []; // Columnas ordenables genéricas
-  @Output() sortedData = new EventEmitter<T[]>(); // Emitir datos ordenados
+  @Input() data: T[] = [];
+  @Input() sortableColumns: { field: keyof T; display: string }[] = [];
+  @Output() sortedData = new EventEmitter<T[]>();
 
   sortDirection: { [key in keyof T]?: 'asc' | 'desc' } = {};
-
-  constructor() {}
 
   sortColumn(column: keyof T) {
     this.sortDirection[column] = this.sortDirection[column] === 'asc' ? 'desc' : 'asc';

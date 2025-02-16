@@ -16,18 +16,10 @@
     <ng-template #userTable>
       <table class="table table-hover table-bordered align-middle text-center shadow-sm rounded">
         <thead>
-          <tr>
-            <ng-container *ngFor="let col of sortableColumns">
-              <th (click)="sortColumn(col.field)">
-                {{ col.display }}
-                <i class="bi" [ngClass]="{
-                  'bi-arrow-down': sortDirection[col.field] === 'asc',
-                  'bi-arrow-up': sortDirection[col.field] === 'desc',
-                  'bi-arrow-down-up': !sortDirection[col.field]
-                }"></i>
-              </th>
-            </ng-container>
-            <th>Acciones</th>
+          <tr appSortableTableHeader
+              [data]="users"
+              [sortableColumns]="sortableColumns"
+              (sortedData)="updateSortedData($event)">
           </tr>
         </thead>
         <tbody>

@@ -1,11 +1,13 @@
 <ng-container *ngFor="let col of sortableColumns">
-    <th (click)="sortColumn(col.field)">
-      {{ col.display }}
-      <i class="bi" [ngClass]="{
-          'bi-arrow-down': sortDirection[col.field] === 'asc',
-          'bi-arrow-up': sortDirection[col.field] === 'desc',
-          'bi-arrow-down-up': !sortDirection[col.field]
-      }"></i>
-    </th>
-  </ng-container>
+  <th (click)="sortColumn(col.field)" style="cursor: pointer;">
+    {{ col.display }}
+    <i class="bi" [ngClass]="{
+      'bi-arrow-down': sortDirection[col.field] === 'asc',
+      'bi-arrow-up': sortDirection[col.field] === 'desc',
+      'bi-arrow-down-up': !sortDirection[col.field]
+    }"></i>
+  </th>  
+</ng-container>
+<th>Acciones</th>
+
   
