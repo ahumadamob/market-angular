@@ -3,16 +3,8 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { User, UserForm } from './user';
+import { ApiResponse } from '../shared/api-response';
 
-export interface ApiResponse<T> {
-  status: number;
-  messages: {
-    type: string;
-    field?: string;
-    content: string;
-  }[];
-  data: T;
-}
 
 @Injectable({
   providedIn: 'root',
@@ -68,14 +60,6 @@ export class UserService {
           return throwError(() => error);
         })
       );
-  }
-
-  private getHttpOptions() {
-    return {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-      }),
-    };
   }
 
   private handleError(error: HttpErrorResponse) {

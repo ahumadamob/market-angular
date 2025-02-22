@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { UserForm } from '../user';
-import { UserService } from '../user.service';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, FormGroup } from '@angular/forms';
 import { ApiResponse } from '../../shared/api-response';
@@ -9,53 +9,55 @@ import { ErrorResponse } from '../../shared/form-validation/error-response.inter
 import { ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { QuitFormConfirmationModalComponent } from '../../shared/quit-form-confirmation-modal/quit-form-confirmation-modal.component';
+import { AdjustmentConfigForm, AdjustmentType } from '../adjustment-config';
+import { AdjustmentConfigService } from '../adjustment-config.service';
 
 
 declare var bootstrap: any;
 
 @Component({
-  selector: 'app-user-form',
-  imports: [FormsModule, FormValidationComponent, QuitFormConfirmationModalComponent],
-  templateUrl: './user-form.component.html',
-  styleUrls: ['./user-form.component.css']
+  selector: 'app-adjustment-config-form',
+  imports: [FormsModule, FormValidationComponent, QuitFormConfirmationModalComponent, CommonModule],
+  templateUrl: './adjustment-config-form.component.html',
+  styleUrl: './adjustment-config-form.component.css'
 })
-
-export class UserFormComponent implements OnInit {
-  @ViewChild('userForm') userFormRef!: NgForm;
-  userForm: FormGroup = new FormGroup({}); // Asegurar que no sea undefined
-  user: UserForm = {
+export class AdjustmentConfigFormComponent {
+  @ViewChild('aForm') aFormRef!: NgForm;
+  aForm: FormGroup = new FormGroup({}); // Asegurar que no sea undefined
+  payload: AdjustmentConfigForm = {
     id: 0,
-    username: '',
-    password: '',
-    email: '',
-    firstName: '',
-    lastName: '',
-    role: 'USER',
-    status: 'ACTIVE',
-    isVerified: false,
+    name: '',
+    type: AdjustmentType.TAX,
+    value: 0,
+    percentage: false,
+    addition: false,
+    startDate: '',
+    endDate: '',
+    displayOnPage: false,
   };
+
   isEditMode = false;
   alertMessage: string | null = null;
 
   constructor(
-    private userService: UserService,
+    private service: AdjustmentConfigService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
-    const userId = this.route.snapshot.paramMap.get('id');
-    if (userId) {
+    const editId = this.route.snapshot.paramMap.get('id');
+    if (editId) {
       this.isEditMode = true;
-      this.loadUser(Number(userId));
+      this.load(Number(editId));
     }
     this.errorResponse = null;
   }
 
-  loadUser(id: number) {
-    this.userService.getUserById(id).subscribe({
+  load(id: number) {
+    this.service.getById(id).subscribe({
       next: (response) => {
-        this.user = response.data;
+        this.payload = response.data;
       },
       error: (err) => {
       }
@@ -64,10 +66,10 @@ export class UserFormComponent implements OnInit {
 
   onSubmit() {
     if (this.isEditMode) {
-    this.userService.updateUser(this.user).subscribe({
+    this.service.update(this.payload).subscribe({
       next: (response) => {
         if (response.status === 200) {
-          this.router.navigate(['/users'], { 
+          this.router.navigate(['/adjustment-config'], { 
             state: { messages: response.messages }
           });
         }
@@ -78,10 +80,10 @@ export class UserFormComponent implements OnInit {
     });
 
     } else {
-      this.userService.createUser(this.user).subscribe({
-        next: (response: ApiResponse<UserForm>) => {
+      this.service.create(this.payload).subscribe({
+        next: (response: ApiResponse<AdjustmentConfigForm>) => {
           if (response.status === 201) {
-            this.router.navigate(['/users'], { 
+            this.router.navigate(['/adjustment-config'], { 
               state: { messages: response.messages } // Pasamos los mensajes a UserListComponent
             });
           }
@@ -105,7 +107,10 @@ export class UserFormComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/user']);
+    this.router.navigate(['/adjustment-config']);
   }
+
+  adjustmentType = AdjustmentType;
+  adjustmentTypes = Object.entries(AdjustmentType).map(([key, value]) => ({ key, value }));
 
 }

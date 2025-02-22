@@ -100,7 +100,7 @@ export class UserListComponent implements OnInit {
    */
 
   newUser() {
-    this.router.navigate(['/users/new']);
+    this.router.navigate(['/user/new']);
   }
 
   /**
