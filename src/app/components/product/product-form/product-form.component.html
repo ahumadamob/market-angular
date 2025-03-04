@@ -1,0 +1,70 @@
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2 class="text-center text-muted">Categoría de Producto</h2>      
+    </div>
+  
+    <form #aForm="ngForm" (ngSubmit)="onSubmit()" class="row g-3" id="aForm" name="aForm" >
+      <app-form-validation [form]="aFormRef" [errorResponse]="errorResponse"></app-form-validation>  
+  
+      <div class="col-md-6">
+
+        <div class="mb-3">
+          <label for="name" class="form-label">Nombre</label>
+          <input type="text" id="name" class="form-control" required [(ngModel)]="payload.name" name="name">
+          <div class="invalid-feedback"></div>
+        </div>
+
+        <div class="mb-3">
+          <label for="price" class="form-label">Precio</label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" id="price" class="form-control" required [(ngModel)]="payload.price" name="price">
+          </div>
+          <div class="invalid-feedback"></div>
+        </div>       
+                    
+      </div>        
+  
+    <div class="col-md-6">
+
+      <div class="mb-3">
+        <label for="productCategory" class="form-label">Categoría</label>
+        <select id="productCategory" class="form-select" required [(ngModel)]="payload.productCategory" name="productCategory">
+          <option [ngValue]="null">[Seleccione categoría]</option>
+            <option *ngFor="let category of categories" [ngValue]="category">
+                {{ category.value }}
+            </option>
+        </select>
+        <div class="invalid-feedback">Por favor, selecciona una categoría válida.</div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label mt-4">Descripción</label>
+        <textarea class="form-control" id="description" name="description" rows="3"
+            [(ngModel)]="payload.description">
+        </textarea>
+      </div> 
+
+    </div>
+  
+    <div class="col-12">
+      <button type="submit" class="btn btn-primary">Guardar</button>
+      <button type="button" class="btn btn-danger ms-2" (click)="cancelConfirmation.show()">Cancelar</button>
+
+    </div>
+  </form>
+    
+  
+  </div>
+  
+  <app-confirmation-modal
+    #cancelConfirmation
+    [title]="'Confirmar Cancelación'"
+    [message]="'¿Estás seguro de que deseas descartar los cambios?'"
+    [confirmButtonText]="'Sí, descartar'"
+    [cancelButtonText]="'No'"
+    (confirm)="cancel()"
+    (cancel)="onCancelClosed()">
+  </app-confirmation-modal>
+  

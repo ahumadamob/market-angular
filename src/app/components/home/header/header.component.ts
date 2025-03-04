@@ -12,6 +12,18 @@ export class HeaderComponent {
   constructor(private router: Router) {}
   
   goToUsers(): void {
-    this.router.navigate(['/users']);
+    this.router.navigate(['/user']);
   }
+
+  goToAdjustmentConfigs(): void {
+    this.router.navigate(['/adjustment-config']);
+  }
+ 
+  goToProductCategories(): void {
+    this.router.navigate(['/product-category']);
+  }
+  
+  goToProducts(): void {
+    this.router.navigate(['/product']);
+  }    
 }
