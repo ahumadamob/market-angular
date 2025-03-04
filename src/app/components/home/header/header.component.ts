@@ -17,5 +17,13 @@ export class HeaderComponent {
 
   goToAdjustmentConfigs(): void {
     this.router.navigate(['/adjustment-config']);
-  }  
+  }
+ 
+  goToProductCategories(): void {
+    this.router.navigate(['/product-category']);
+  }
+  
+  goToProducts(): void {
+    this.router.navigate(['/product']);
+  }    
 }
